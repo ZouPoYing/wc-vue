@@ -10,11 +10,10 @@
         </header>
         <div class="weui-cells">
             <div class="weui-cell">
-                <div class="weui-cell__hd"><img :src="userInfo.headerUrl" alt="" class="self-header" style="width:60px"></div>
+                <div class="weui-cell__hd"><img :src="info.userHead" alt="" class="self-header" style="width:60px"></div>
                 <div class="weui-cell__bd">
-                    <h4 class="self-nickname">{{userInfo.nickname}}<span class="gender" :class="[userInfo.sex===1?'gender-male':'gender-female']"></span></h4>
-                    <p class="self-wxid" style="font-size: 13px;color: #999;">微信号: {{userInfo.wxid}}</p>
-                    <p class="nickname" style="font-size: 13px;color: #999;">昵称:{{userInfo.nickname||'无'}}</p>
+                    <h4 class="self-nickname">{{info.userName}}<span class="gender" :class="[info.sex== '男'?'gender-male':info.sex == '女'?'gender-female':'']"></span></h4>
+                    <p class="self-wxid" style="font-size: 13px;color: #999;">微信号: {{info.userId}}</p>
                 </div>
             </div>
         </div>
@@ -34,7 +33,15 @@
                     <p>地区</p>
                 </div>
                 <div class="weui-cell__ft" style="-webkit-flex: 4;text-align: left;">
-                    <span v-for="item in userInfo.area">{{item}}&nbsp;&nbsp;&nbsp;</span>
+                    <span>{{info.province}}  {{info.city}}</span>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <p>个性签名</p>
+                </div>
+                <div class="weui-cell__ft" style="-webkit-flex: 4;text-align: left;">
+                    <span>{{info.signature}}</span>
                 </div>
             </div>
             <div class="weui-cell weui-cell_access">
@@ -56,25 +63,100 @@
                 </div>
             </div>
         </div>
-
-        <a href="javascript:;" class="weui-btn weui-btn_primary" style="width:90%;margin-top:20px;">发消息</a>
-        <a href="javascript:;" class="weui-btn weui-btn_default" style="width:90%">视频</a>
-
+        <a v-if="isFriend" href="javascript:;" @click="goto" class="weui-btn weui-btn_primary" style="width:90%;margin-top:20px;">发消息</a>
+        <a v-else href="javascript:;" class="weui-btn weui-btn_primary" @click="showDia" style="width:90%;margin-top:20px;">加好友</a>
+        <el-dialog class="dialog" width="80%" title="申请添加朋友" :visible.sync="dialogFormVisible" append-to-body>
+            <el-form>
+                <el-form-item>
+                    <el-input type="textarea" maxlength="200" autosize show-word-limit v-model="tips" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="success" @click="addFriend">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
-    import user from "../../vuex/user"
+    import axios from "axios";
     export default {
         data() {
             return {
-                pageName: ""
+                pageName: "",
+              info: {},
+              userInfo: {},
+              isFriend: false,
+              dialogFormVisible: false,
+              tips: ''
             }
         },
-        computed: {
-            userInfo() {
-                return user.getUserInfo(this.$route.query.wxid)
+      created() {
+          this.initPage()
+      },
+      methods: {
+        goto() {
+          this.$router.push({
+            path: '/wechat/dialogue',
+            query: {
+              name: this.info.userName,
+              friend: this.info.userId
             }
+          })
+        },
+        initPage() {
+          this.getUserInfo()
+          this.isFriendF()
+          this.setTips()
+        },
+        addFriend() {
+          var that = this
+          axios.post('/friend/friendApply', {
+            userId: this.$store.state.user.userId,
+            friend: this.$route.query.wxid,
+            tips: this.tips
+          }).then(function(res){
+            if (res.data.success) {
+              that.$toast('申请成功');
+            } else {
+              that.$toast(res.data.msg);
+            }
+            that.showDia()
+          })
+        },
+        getUserInfo() {
+          var that = this
+          axios.post('/user/getMyInfoByUserId', {
+            userId: this.$route.query.wxid
+          }).then(function(res){
+            if (res.data.success) {
+              that.info = res.data.user
+            } else {
+              that.$toast(res.data.msg);
+            }
+          })
+        },
+        isFriendF() {
+          var that = this
+          axios.post('/friend/isFriend', {
+            userId: this.$store.state.user.userId,
+            friend: this.$route.query.wxid
+          }).then(function(res){
+            if (res.data.success) {
+              that.isFriend = res.data.isFriend
+            }
+          })
+        },
+        showDia() {
+          this.dialogFormVisible = !this.dialogFormVisible
+        },
+        setTips() {
+          this.tips = '我是' + this.$store.state.user.userName
         }
+      },
+      computed: {
+
+      }
     }
 </script>
 <style>

@@ -9,6 +9,10 @@ Vue.use(Vuex)
     // 统一管理接口域名 
 let apiPublicDomain = '//vrapi.snail.com/'
 const state = {
+    friends: [],
+    user: {},
+    isLoginPage: true,
+    isLogin: false,
     currentLang: "zh", //当前使用的语言 zh：简体中文 en:英文 后期需要
     newMsgCount: 0, //新消息数量
     allContacts: user.users, //所有好友

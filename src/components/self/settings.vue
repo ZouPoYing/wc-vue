@@ -31,21 +31,35 @@
                 </router-link>
             </div>
             <div class="weui-cells">
-                <a class="weui-cell weui-cell_access" href="https://kf.qq.com/touch/product/wechat_app.html?platform=15&amp;scene_id=kf338">
+                <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">帮助与反馈</div>
                     <div class="weui-cell__ft"></div>
-                </a>
+                </div>
                 <div class="weui-cell weui-cell_access">
                     <div class="weui-cell__bd">关于微信</div>
                     <div class="weui-cell__ft"></div>
                 </div>
             </div>
             <div class="weui-btn-area">
-                <button class="weui-btn weui-btn_warn" id="exitBtn">退出登录</button>
+                <button class="weui-btn weui-btn_warn" @click="loginout" id="exitBtn">退出登录</button>
             </div>
         </section>
     </div>
 </template>
 <script>
-    export default {}
+    export default {
+      data() {
+        return  {
+
+        }
+      },
+      methods: {
+        loginout() {
+          this.$store.commit('setUser',{});
+          this.$store.commit('setIsLoginPage',true);
+          this.$store.commit('setIsLogin',false);
+          this.$router.push('/login')
+        }
+      }
+    }
 </script>

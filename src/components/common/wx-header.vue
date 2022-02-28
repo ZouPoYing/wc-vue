@@ -16,7 +16,7 @@
         <li> <span class="iconfont icon-tips-xiaoxi"></span>
           <div>发起群聊</div>
         </li>
-        <li> <span class="iconfont icon-tips-add-friend"></span>
+        <li @click="goto"> <span class="iconfont icon-tips-add-friend"></span>
           <div>添加朋友</div>
         </li>
         <li> <span class="iconfont icon-tips-saoyisao"></span>
@@ -49,6 +49,9 @@
             }
         },
         methods: {
+          goto() {
+            this.$router.push('contact/add-friend')
+          },
             // 暂且用不到 先留着
             goBack() {
                 this.$router.go(-1)

@@ -11,10 +11,15 @@
         </header>
         <section>
             <div class="clearfix">
-                <div class="header"><img src="https://sinacloud.net/vue-wechat/images/headers/header01.png" alt="" style="width:40px"></div>
+                <div class="header"><img :src="$store.state.user.userHead" alt="" style="width:40px"></div>
                 <div class="info">
-                    <p><span>阿荡</span><span class="gender gender-male"></span></p>
-                    <span>江苏 苏州</span>
+                    <p>
+                        <span>{{$store.state.user.userName}}</span>
+                        <span v-if="$store.state.user.sex == '女'" class="gender gender-female"></span>
+                        <span v-else-if="$store.state.user.sex == '男'" class="gender gender-male"></span>
+                        <span v-else></span>
+                    </p>
+                    <span>{{$store.state.user.province}} {{$store.state.user.city}}</span>
                 </div>
             </div>
             <div id="qrcode-pic" class="clearfix"></div>
@@ -26,7 +31,7 @@
     export default {
         mounted() {
             new QRCode(document.getElementById("qrcode-pic"), {
-                text: "https://vue2-wechat.github.io/",
+                text: "https://www.baidu.com/",
                 width: 128,
                 height: 128,
                 colorDark: "#000000",
@@ -60,7 +65,6 @@
     }
     
     .qrcode #qrcode-pic {
-        background: url("https://sinacloud.net/vue-wechat/images/qrcode.jpg");
         background-size: 100% 100%;
         width: 300px;
         height: 300px;

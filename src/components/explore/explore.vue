@@ -11,10 +11,6 @@
             朋友圈
           </div>
           <div class="weui-cell__ft">
-            <div class="home__notice" v-show="momentNewMsg">
-              <img src="https://sinacloud.net/vue-wechat/images/headers/yehua.jpg" alt="" class="">
-              <i class="new-msg-dot"></i>
-            </div>
           </div>
         </router-link>
       </div>
@@ -36,34 +32,34 @@
           </div>
         </div>
       </div>
-      <!--<div class="weui-cells">
+      <div class="weui-cells">
         <div class="weui-cell weui-cell_access">
           <div class="weui-cell__hd">
-            <i class="home__icon-nearby___3PPpY home__icon___2XgfG"></i>
+            <img src="../../assets/images/look.png">
           </div>
           <div class="weui-cell__bd">
-            附近的人
+            看一看
           </div>
         </div>
         <div class="weui-cell weui-cell_access">
           <div class="weui-cell__hd">
-            <i class="home__icon-box___3tn0U home__icon___2XgfG"></i>
+              <img src="../../assets/images/search.png">
           </div>
           <div class="weui-cell__bd">
-            漂流瓶
+            搜一搜
           </div>
         </div>
-      </div>-->
+      </div>
 
       <div class="weui-cells">
-        <a href="http://wq.jd.com" class="weui-cell weui-cell_access">
+        <div class="weui-cell weui-cell_access">
           <div class="weui-cell__hd">
             <img src="../../assets/images/find_icon-shopping.png">
           </div>
           <div class="weui-cell__bd">
             购物
           </div>
-        </a>
+        </div>
         <div class="weui-cell weui-cell_access">
           <div class="weui-cell__hd">
             <img src="../../assets/images/find_icon-moregame.png">
@@ -81,8 +77,7 @@
         mixins: [window.mixin],
         data() {
             return {
-                pageName: "发现",
-                momentNewMsg: true
+                pageName: "发现"
             }
         },
         activated() {

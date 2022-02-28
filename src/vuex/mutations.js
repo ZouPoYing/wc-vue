@@ -1,4 +1,16 @@
 const mutations = {
+    setFriends(state,friends) {
+      state.friends = friends
+    },
+    setUser(state,user) {
+      state.user = user
+    },
+    setIsLoginPage(state,v) {
+      state.isLoginPage = v
+    },
+    setIsLogin(state,v) {
+      state.isLogin = v
+    },
     //切换语言 后期需要
     switchLang(state, lang) {
         state.currentLang = lang

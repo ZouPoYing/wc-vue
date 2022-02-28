@@ -8,55 +8,53 @@
                         <p>新的朋友</p>
                     </div>
                 </router-link>
-                <router-link to="/contact/group-list" class="weui-cell">
-                    <div class="weui-cell_hd"> <img class="img-obj-cover" src="../../assets/images/contact_top-addgroup.png"> </div>
-                    <div class="weui-cell_bd weui-cell_primary">
-                        <p>群聊</p>
-                    </div>
-                </router-link>
-                <router-link to="/contact/tags" class="weui-cell">
-                    <div class="weui-cell_hd"> <img class="img-obj-cover" src="../../assets/images/contact_top-tag.png"> </div>
-                    <div class="weui-cell_bd weui-cell_primary">
-                        <p>标签</p>
-                    </div>
-                </router-link>
-                <router-link to="/contact/official-accounts" class="weui-cell">
-                    <div class="weui-cell_hd"><img class="img-obj-cover" src="../../assets/images/contact_top-offical.png"></div>
-                    <div class="weui-cell_bd weui-cell_primary">
-                        <p>公众号</p>
-                    </div>
-                </router-link>
             </div>
-            <!--联系人集合-->
-            <template v-for="(value,key) in contactsList">
-                <!--首字母-->
-                <div class="weui-cells__title">{{key}}</div>
+            <template v-for="(item,key) in info">
                 <div class="weui-cells">
-                    <router-link :key="item.wxid" :to="{path:'/contact/details',query:{wxid:item.wxid}}" class="weui-cell weui-cell_access" v-for="item in value"
-                        tag="div">
+                    <router-link :key="item.wxid" :to="{path:'/contact/details',query:{wxid:item.userId}}" class="weui-cell weui-cell_access" tag="div">
                         <div class="weui-cell__hd">
-                            <img :src="item.headerUrl" class="home__mini-avatar___1nSrW">
+                            <img :src="item.userHead" class="home__mini-avatar___1nSrW">
                         </div>
                         <div class="weui-cell__bd">
-                            {{item.remark?item.remark:item.nickname}}
+                            {{item.userName}}
                         </div>
                     </router-link>
                 </div>
             </template>
 </section>
-<!--首字母排序 后期需要实现检索功能-->
-<div class="initial-bar"><span v-for="i in initialList">{{i}}</span></div>
 </div>
 </template>
 <script>
+    import axios from "axios";
+
     export default {
         mixins: [window.mixin],
         data() {
             return {
-                "pageName": "通讯录"
+                "pageName": "通讯录",
+              info: []
             }
         },
-        mounted() {
+      created() {
+          this.initPage()
+      },
+      methods: {
+          getFriend() {
+            var that = this
+            axios.post('/friend/getFriend',{
+              userId: that.$store.state.user.userId
+            }).then(function (res) {
+              if (res.data.success) {
+                that.info = res.data.friends
+                that.$store.commit('setFriends',res.data.friends);
+              }
+            })
+          },
+          initPage() {
+            this.getFriend()
+          }
+      },
+      mounted() {
             // mutations.js中有介绍
             this.$store.commit("toggleTipsStatus", -1)
         },

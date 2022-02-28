@@ -10,15 +10,22 @@
             </div>
         </header>
         <div class="search-line">
-            <span class="iconfont icon-search"></span>
-            <input type="text" placeholder="微信号/手机号">
+            <span class="iconfont icon-search" @click="findFriend"></span>
+            <input type="text" v-model="friend" placeholder="微信号/手机号">
         </div>
         <p style="padding-top:8px;text-align: center;">
             <span>我的微信号:</span>
-            <span>10086</span>
+            <span>{{$store.state.user.userId}}</span>
             <router-link to="/self/profile/my-qrcode">&nbsp;<img src="../../assets/images/contact_add-friend-my-qr.png" style="vertical-align: middle;;width:24px" class="_align-middle"></router-link>
         </p>
-        <div class="weui-cells">
+        <div v-if="show" class="weui-cells">
+            <a class="weui-cell weui-cell_access">
+                <div class="weui-cell__bd">
+                    <p style="margin-left: 130px">该用户不存在</p>
+                </div>
+            </a>
+        </div>
+        <div v-else class="weui-cells">
             <a class="weui-cell weui-cell_access">
                 <div class="weui-cell__hd"><img src="../../assets/images/contact_add-friend-reda.png" alt=""></div>
                 <div class="weui-cell__bd">
@@ -63,7 +70,42 @@
     </div>
 </template>
 <script>
-    export default {}
+    import axios from 'axios'
+    export default {
+      data() {
+        return {
+          pageName: "",
+          show: false,
+          friend: ''
+        }
+      },
+      created() {
+        this.initPage()
+      },
+      methods: {
+        initPage() {
+          this.show = false
+          this.friend = ''
+        },
+        findFriend() {
+          var that = this
+          axios.post('/user/findUser',{
+            friend: this.friend
+          }).then(function (res) {
+            if (res.data.success) {
+                that.$router.push({
+                  path:'/contact/details',
+                  query:{wxid:res.data.user.userId}
+                })
+            } else if (!res.data.success) {
+                that.show = true
+            } else {
+                that.$toast(res.data.msg)
+            }
+          })
+        }
+      }
+    }
 </script>
 <style>
     .add-friend .search-line {

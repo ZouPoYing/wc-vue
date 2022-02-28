@@ -2,100 +2,251 @@
     <div>
         <header id="wx-header">
             <div class="other">
-                <router-link :to="{path:'/wechat/dialogue/dialogue-info',query: { msgInfo: msgInfo}}" tag="span" class="iconfont icon-chat-group" v-show="$route.query.group_num&&$route.query.group_num!=1"></router-link>
-                <router-link :to="{path:'/wechat/dialogue/dialogue-detail',query: { msgInfo: msgInfo}}" tag="span" class="iconfont icon-chat-friends" v-show="$route.query.group_num==1"></router-link>
             </div>
             <div class="center">
                 <router-link to="/" tag="div" class="iconfont icon-return-arrow">
                     <span>微信</span>
                 </router-link>
                 <span>{{pageName}}</span>
-                <span class="parentheses" v-show='$route.query.group_num&&$route.query.group_num!=1'>{{$route.query.group_num}}</span>
             </div>
         </header>
-        <section class="dialogue-section clearfix" v-on:click="MenuOutsideClick">
-            <div class="row clearfix" v-for="item in msgInfo.msg">
-                <img :src="item.headerUrl" class="header">
-                <p class="text" v-more>{{item.text}}</p>
+        <section class="dialogue-section clearfix">
+            <div class="row clearfix" v-for="(item,index) in info">
+                <div v-if="item.mark == 'to'">
+                    <img :src="item.userHead" class="header">
+                    <div v-if="item.type == 'friend'">
+                        <router-link :to="{path:'/contact/details',query:{wxid:item.value}}" tag="div">
+                            <p class="text" v-more>
+                                <img style="width: 50px" :src="item.fHead">{{item.fName}}
+                            </p>
+                        </router-link>
+                    </div>
+                    <div v-else-if="item.type == 'pic'">
+                        <p class="text" v-more>
+                            <img style="width: 200px" fit="widthFix" :src="item.fileUrl">
+                        </p>
+                    </div>
+                    <div v-else-if="item.type == 'file'">
+                        <p class="text" v-more @click.stop="downloadFile(item.fileName)">
+                            <i style="font-size: 50px" class="el-icon-folder-remove"></i>
+                        </p>
+                    </div>
+                    <div v-else>
+                        <p class="text" v-more>{{item.value}}</p>
+                    </div>
+                </div>
+                <div v-else>
+                    <img :src="item.userHead" class="cheader">
+                    <div v-if="item.type == 'friend'">
+                        <router-link :to="{path:'/contact/details',query:{wxid:item.value}}" tag="div">
+                            <p class="ctext" v-more>
+                                <img style="width: 50px" :src="item.fHead">{{item.fName}}
+                            </p>
+                        </router-link>
+                    </div>
+                    <div v-else-if="item.type == 'pic'">
+                        <p class="ctext" v-more>
+                            <img style="width: 200px" fit="widthFix" :src="item.fileUrl">
+                        </p>
+                    </div>
+                    <div v-else-if="item.type == 'file'">
+                        <p class="ctext" v-more @click.stop="downloadFile(item.fileName)">
+                            <i style="font-size: 50px" class="el-icon-folder-remove"></i>
+                        </p>
+                    </div>
+                    <div v-else>
+                        <p class="ctext" v-more>{{item.value}}</p>
+                    </div>
+                </div>
             </div>
-            <span class="msg-more" id="msg-more"><ul>
-                    <li>复制</li>
-                    <li>转发</li>
-                    <li>收藏</li>
-                    <li>删除</li>
-                </ul></span>
         </section>
+        <el-dialog class="dialog" width="80%" title="选择联系人" :visible.sync="dialogFormVisible" append-to-body>
+            <el-form>
+                <el-form-item>
+                    <el-select v-model="friend" placeholder="请选择">
+                        <el-option
+                                v-for="item in $store.state.friends"
+                                :key="item.userId"
+                                :label="item.userName"
+                                :value="item.userId">
+                            <img width="30px" :src="item.userHead">
+                            <span style="float: right; color: #8492a6; font-size: 13px">{{ item.userName }}</span>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="success" @click="sendFriend">确 定</el-button>
+            </div>
+        </el-dialog>
         <footer class="dialogue-footer">
             <div class="component-dialogue-bar-person">
-                <span class="iconfont icon-dialogue-jianpan" v-show="!currentChatWay" v-on:click="currentChatWay=true"></span>
-                <span class="iconfont icon-dialogue-voice" v-show="currentChatWay" v-on:click="currentChatWay=false"></span>
-                <div class="chat-way" v-show="!currentChatWay">
-                    <div class="chat-say" v-press>
-                        <span class="one">按住 说话</span>
-                        <span class="two">松开 结束</span>
-                    </div>
+                <span class="iconfont icon-dialogue-voice"></span>
+                <div class="chat-way">
+                    <input class="chat-txt" v-model="text" type="text" />
                 </div>
-                <div class="chat-way" v-show="currentChatWay">
-                    <input class="chat-txt" type="text" @focus="focusIpt" />
-                </div>
-                <span class="expression iconfont icon-dialogue-smile"></span>
-                <span class="more iconfont icon-dialogue-jia"></span>
-                <div class="recording" style="display: none;" id="recording">
-                    <div class="recording-voice" style="display: none;" id="recording-voice">
-                        <div class="voice-inner">
-                            <div class="voice-icon"></div>
-                            <div class="voice-volume">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                        <p>手指上划,取消发送</p>
+                <a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_primary" @click="sendMessage()" style="width: 18%;margin: 5px 0 0 5px;">发送</a>
+                <el-popover
+                        placement="top"
+                        width="200"
+                        trigger="click">
+                    <div class="icon" @click="dialogFormVisible = !dialogFormVisible">
+                        <i class="el-icon-user-solid"></i>
                     </div>
-                    <div class="recording-cancel" style="display: none;">
-                        <div class="cancel-inner"></div>
-                        <p>松开手指,取消发送</p>
+                    <div class="icon" >
+                        <el-upload style="display: inline;" class="avatar-uploader"
+                                   action
+                                   :http-request="handleUploadForm"
+                                   :show-file-list="false"
+                                   :before-upload="beforeAvatarUpload">
+                            <i class="el-icon-picture"></i>
+                        </el-upload>
                     </div>
-                </div>
+                    <div class="icon" >
+                        <el-upload style="display: inline;" class="avatar-uploader"
+                                   action
+                                   :http-request="fileHandleUploadForm"
+                                   :show-file-list="false">
+                            <i class="el-icon-folder-remove"></i>
+                        </el-upload>
+                    </div>
+                    <span slot="reference" class="more iconfont icon-dialogue-jia"></span>
+                </el-popover>
             </div>
         </footer>
     </div>
 </template>
 <script>
+    import axios from "axios";
+
     export default {
         data() {
             return {
-                pageName: this.$route.query.name,
-                currentChatWay: true //ture为键盘打字 false为语音输入
-                    // sayActive: false // false 键盘打字 true 语音输入
+              text: '',
+              info: [],
+              pageName: this.$route.query.name,
+              dialogFormVisible: false,
+              friend: ''
             }
         },
+      created() {
+          this.initPage()
+      },
+      methods: {
+        downloadFile(fileName) {
+          window.location.href='http://localhost:8070/file/downloadFile/' + fileName;
+        },
+        fileHandleUploadForm(param) {
+          var that = this
+          let formData = new FormData();
+          formData.append('userId', this.$store.state.user.userId)
+          formData.append('file', param.file)
+          axios.post('file/upload',formData).then(function(res){
+            that.sendFile(res.data.fileId);
+          })
+        },
+        handleUploadForm(param) {
+          var that = this
+          let formData = new FormData();
+          formData.append('userId', this.$store.state.user.userId)
+          formData.append('file', param.file)
+          axios.post('file/upload',formData).then(function(res){
+            that.sendPic(res.data.fileId);
+          })
+        },
+        beforeAvatarUpload(file) {
+          const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+          const isLt2M = file.size / 1024 / 1024 < 2;
+          if (!isJPG) {
+            this.$toast('发送图片只能是 JPG 格式!');
+          }
+          if (!isLt2M) {
+            this.$toast('发送图片大小不能超过 2MB!');
+          }
+          return isJPG && isLt2M;
+        },
+        sendFile(fileId) {
+          var that = this
+          axios.post('/message/sendMessage', {
+            userId: that.$store.state.user.userId,
+            friend: that.$route.query.friend,
+            value: fileId,
+            type: 'file'
+          }).then(function(res) {
+            if (res.data.success) {
+              that.initPage()
+            }
+          })
+        },
+        sendPic(fileId) {
+          var that = this
+          axios.post('/message/sendMessage', {
+            userId: that.$store.state.user.userId,
+            friend: that.$route.query.friend,
+            value: fileId,
+            type: 'pic'
+          }).then(function(res) {
+            if (res.data.success) {
+              that.initPage()
+            }
+          })
+        },
+        sendFriend() {
+          var that = this
+          axios.post('/message/sendMessage',{
+            userId: that.$store.state.user.userId,
+            friend: that.$route.query.friend,
+            value: that.friend,
+            type: 'friend'
+          }).then(function (res) {
+            if (res.data.success) {
+              that.friend = ''
+              that.initPage()
+            }
+          })
+          this.dialogFormVisible = !this.dialogFormVisible
+        },
+          sendMessage() {
+            var that = this
+            axios.post('/message/sendMessage',{
+              userId: that.$store.state.user.userId,
+              friend: that.$route.query.friend,
+              value: that.text,
+              type: 'text'
+            }).then(function (res) {
+              if (res.data.success) {
+                that.text = ''
+                that.initPage()
+              }
+            })
+          },
+          getMessage() {
+            var that = this
+            axios.post('/message/getMessage',{
+              userId: that.$store.state.user.userId,
+              friend: that.$route.query.friend
+            }).then(function (res) {
+              if (res.data.success) {
+                that.info = res.data.message
+              }
+            })
+          },
+          initPage() {
+            this.getMessage()
+          }
+      },
         beforeRouteEnter(to, from, next) {
             next(vm => {
                 vm.$store.commit("setPageName", vm.$route.query.name)
             })
         },
         computed: {
-            msgInfo() {
-                for (var i in this.$store.state.msgList.baseMsg) {
-                    if (this.$store.state.msgList.baseMsg[i].mid == this.$route.query.mid) {
-                        return this.$store.state.msgList.baseMsg[i]
-                    }
-                }
-            }
+
         },
         directives: {
             press: {
                 bind(element, binding) {
-                    // var recording = document.querySelector('.recording'),
-                    //     recordingVoice = document.querySelector('.recording-voice'),
-                    //     recordingCancel = document.querySelector('.recording-cancel'),
                     var startTx, startTy
                     element.addEventListener('touchstart', function(e) {
                         // 为什么每次注册监听器,都要重新获取一次 DOM 像上面写就 undefine?
@@ -103,7 +254,6 @@
                             recordingVoice = document.querySelector('.recording-voice')
                         element.className = "chat-say say-active"
                         recording.style.display = recordingVoice.style.display = "block"
-                            // console.log('start')
                         var touches = e.touches[0]
                         startTx = touches.clientX
                         startTy = touches.clientY
@@ -115,7 +265,6 @@
                             recordingCancel = document.querySelector('.recording-cancel')
                         element.className = "chat-say"
                         recordingCancel.style.display = recording.style.display = recordingVoice.style.display = "none"
-                            // console.log('end')
                         e.preventDefault()
                     }, false)
                     element.addEventListener('touchmove', function(e) {
@@ -160,24 +309,6 @@
                     }, false)
                 }
             }
-        },
-        methods: {
-            // 解决输入法被激活时 底部输入框被遮住问题
-            focusIpt() {
-                var interval = setInterval(function() {
-                    document.body.scrollTop = document.body.scrollHeight
-                }, 100)
-            },
-            // 点击空白区域，菜单被隐藏
-            MenuOutsideClick(e) {
-                var container = document.querySelectorAll('.text'),
-                    msgMore = document.getElementById('msg-more')
-                if (e.target.className === 'text') {
-
-                } else {
-                    msgMore.style.display = 'none'
-                }
-            }
         }
     }
 </script>
@@ -185,5 +316,40 @@
     @import "../../assets/css/dialogue.css";
     .say-active {
         background: #c6c7ca;
+    }
+    .icon {
+        font-size: 40px;
+        display: inline;
+        width: 50px;
+        height: 50px;
+    }
+    .cheader{
+        width:35px;
+        float:right;
+        display:block;
+        position:relative;
+        left: 60px;
+    }
+    .ctext{
+        float:right;
+        background:#9eea6a;
+        padding:8px;
+        box-sizing:border-box;
+        margin-left:10px;
+        position:relative;
+        border-radius:4px;
+        max-width:80%;
+        font-size:14px;
+        left: 50px;
+    }
+    .dialogue-section .row .ctext:before {
+        width: 0;
+        height: 0;
+        position: absolute;
+        right: -12px;
+        top: 11px;
+        content: "";
+        border: 6px solid transparent;
+        border-left-color: #9eea6a;
     }
 </style>

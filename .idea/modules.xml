@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../fms/.idea/fms.iml" filepath="$PROJECT_DIR$/../fms/.idea/fms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../hichat/.idea/hichat.iml" filepath="$PROJECT_DIR$/../hichat/.idea/hichat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../hichat-web/.idea/hichat-web.iml" filepath="$PROJECT_DIR$/../hichat-web/.idea/hichat-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../vue-wc/.idea/vue-wc.iml" filepath="$PROJECT_DIR$/../vue-wc/.idea/vue-wc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/vue2-WeChat.iml" filepath="$PROJECT_DIR$/.idea/vue2-WeChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../vue3/.idea/vue3.iml" filepath="$PROJECT_DIR$/../vue3/.idea/vue3.iml" />
+    </modules>
+  </component>
+</project>
