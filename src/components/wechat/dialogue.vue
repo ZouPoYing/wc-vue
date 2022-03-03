@@ -133,6 +133,12 @@
       created() {
           this.initPage()
       },
+      mounted() {
+        this.timer = setInterval(this.getMessage, 1000);
+      },
+      beforeDestroy() {
+        clearInterval(this.timer);
+      },
       methods: {
         downloadFile(fileName) {
           window.location.href='http://localhost:8070/file/downloadFile/' + fileName;
