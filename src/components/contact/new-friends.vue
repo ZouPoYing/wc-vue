@@ -41,6 +41,12 @@
       created() {
         this.initPage()
       },
+      mounted() {
+        this.timer = setInterval(this.getApply, 1000);
+      },
+      beforeDestroy() {
+        clearInterval(this.timer);
+      },
       methods: {
         accept(friendId) {
           var that = this
