@@ -22,6 +22,12 @@
                 "pageName": "微信"
             }
         },
+        mounted() {
+            this.timer = setInterval(this.getChatRoom, 1000);
+        },
+        beforeDestroy() {
+            clearInterval(this.timer);
+        },
       methods: {
           getChatRoom() {
             var that = this
