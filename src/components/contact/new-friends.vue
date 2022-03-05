@@ -23,6 +23,7 @@
                 <div v-else-if="item.status == '拒绝'" class="weui-cell_ft">已拒绝</div>
                 <div v-else-if="item.status == '申请'" class="weui-cell_ft">
                     <a href="javascript:;" @click.stop="accept(item.friendId)" class="weui-btn weui-btn_mini weui-btn_primary">接受</a>
+                    <a href="javascript:;" @click.stop="refuse(item.friendId)" class="weui-btn weui-btn_mini weui-btn_primary">拒绝</a>
                 </div>
             </div>
         </div>
@@ -48,6 +49,16 @@
         clearInterval(this.timer);
       },
       methods: {
+        refuse(friendId) {
+          var that = this
+          axios.post('/friend/refuseByFriendId',{
+            friendId: friendId
+          }).then(function (res) {
+            if (res.data.success) {
+              that.initPage()
+            }
+          })
+        },
         accept(friendId) {
           var that = this
           axios.post('/friend/acceptByFriendId',{

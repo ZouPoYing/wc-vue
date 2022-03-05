@@ -54,7 +54,11 @@
             this.getFriend()
           }
       },
+      beforeDestroy() {
+        clearInterval(this.timer);
+      },
       mounted() {
+        this.timer = setInterval(this.getFriend, 1000);
             // mutations.js中有介绍
             this.$store.commit("toggleTipsStatus", -1)
         },
