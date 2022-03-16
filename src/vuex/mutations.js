@@ -1,4 +1,7 @@
 const mutations = {
+    setTipsStatus(state,tipsStatus) {
+      state.tipsStatus = tipsStatus
+    },
     setFriends(state,friends) {
       state.friends = friends
     },

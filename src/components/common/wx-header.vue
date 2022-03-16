@@ -13,7 +13,7 @@
       <span class="iconfont icon-chat-friends" v-show="$route.path==='/wechat/dialogue'"></span>
       <!-- 更多图标的菜单 附带过渡效果-->
       <ul class="tips-menu" :class="[$store.state.tipsStatus?'tips-open':'tips-close']">
-        <li> <span class="iconfont icon-tips-xiaoxi"></span>
+        <li @click="group"> <span class="iconfont icon-tips-xiaoxi"></span>
           <div>发起群聊</div>
         </li>
         <li @click="goto"> <span class="iconfont icon-tips-add-friend"></span>
@@ -28,9 +28,20 @@
       </ul>
       <!--<div class="tips-masker" v-show="tips_isOpen"></div>-->
     </div>
+    <el-dialog class="dialog" width="80%" title="选择联系人" :visible.sync="dialogFormVisible" append-to-body>
+      <el-checkbox-group
+            v-model="checkedFriend"
+            :min="1">
+          <el-checkbox v-for="(friend,index) in $store.state.friends" :label="friend.userId" :key="index">{{friend.userName}}</el-checkbox>
+      </el-checkbox-group>
+      <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="success" @click="createGroup">确 定</el-button>
+      </div>
+    </el-dialog>
     <div class="center">
       <!-- <transition name="fade">
-          <div class="iconfont icon-return-arrow" style="left: 10px;position: absolute;font-size: 16px;" v-on:click="goBack" v-show="$route.path.split('/').length>2"><span>{{$store.state.backPageName}}</span></div> 
+          <div class="iconfont icon-return-arrow" style="left: 10px;position: absolute;font-size: 16px;" v-on:click="goBack" v-show="$route.path.split('/').length>2"><span>{{$store.state.backPageName}}</span></div>
       </transition>-->
       <!--显示当前页的名字-->
       <span>{{$store.state.currentPageName}}</span>
@@ -40,15 +51,31 @@
   </div>
 </template>
 <script>
+    import axios from 'axios'
+
     export default {
         props: ["pageName"],
         data() {
             return {
+              checkedFriend: [],
+              dialogFormVisible: false,
                 // 暂且用不到
                 chatCount: true
             }
         },
         methods: {
+          createGroup() {
+            var that = this
+            axios.post('/group/createGroup', {
+              userId: that.$store.state.user.userId,
+              friends: that.checkedFriend.toString()
+            })
+            this.dialogFormVisible = false
+          },
+          group() {
+            this.$store.commit('setTipsStatus', false)
+            this.dialogFormVisible = true
+          },
           goto() {
             this.$router.push('contact/add-friend')
           },

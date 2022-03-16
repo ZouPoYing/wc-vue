@@ -125,6 +125,7 @@
             return {
               text: '',
               info: [],
+              isFriend: this.$route.query.isFriend,
               pageName: this.$route.query.name,
               dialogFormVisible: false,
               friend: ''
@@ -178,7 +179,8 @@
             userId: that.$store.state.user.userId,
             friend: that.$route.query.friend,
             value: fileId,
-            type: 'file'
+            type: 'file',
+            isFriend: that.isFriend
           }).then(function(res) {
             if (res.data.success) {
               that.initPage()
@@ -191,7 +193,8 @@
             userId: that.$store.state.user.userId,
             friend: that.$route.query.friend,
             value: fileId,
-            type: 'pic'
+            type: 'pic',
+            isFriend: that.isFriend
           }).then(function(res) {
             if (res.data.success) {
               that.initPage()
@@ -204,7 +207,8 @@
             userId: that.$store.state.user.userId,
             friend: that.$route.query.friend,
             value: that.friend,
-            type: 'friend'
+            type: 'friend',
+            isFriend: that.isFriend
           }).then(function (res) {
             if (res.data.success) {
               that.friend = ''
@@ -219,7 +223,8 @@
               userId: that.$store.state.user.userId,
               friend: that.$route.query.friend,
               value: that.text,
-              type: 'text'
+              type: 'text',
+              isFriend: that.isFriend
             }).then(function (res) {
               if (res.data.success) {
                 that.text = ''
@@ -231,7 +236,8 @@
             var that = this
             axios.post('/message/getMessage',{
               userId: that.$store.state.user.userId,
-              friend: that.$route.query.friend
+              friend: that.$route.query.friend,
+              isFriend: that.isFriend
             }).then(function (res) {
               if (res.data.success) {
                 that.info = res.data.message

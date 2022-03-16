@@ -2,7 +2,7 @@
     <!--消息列表组件 数据交互频繁-->
     <!--进入 dialogue 页面，携带参数 mid name group_num -->
     <li>
-        <router-link :to="{ path: '/wechat/dialogue', query: { name:item.userName,friend:item.friend}}" tag="div" class="list-info" v-swiper>
+        <router-link :to="{ path: '/wechat/dialogue', query: { name:item.groupId == undefined || item.groupId == ''?item.userName:item.groupName,friend:item.friend,isFriend:item.groupId == undefined || item.groupId == ''}}" tag="div" class="list-info" v-swiper>
             <div class="header-box">
                 <div class="header">
                     <img :src="item.userHead">
@@ -10,7 +10,8 @@
             </div>
             <div class="desc-box">
                 <div class="desc-time">{{item.time}}</div>
-                <div class="desc-author">{{item.userName}}</div>
+                <div class="desc-author" v-if="item.groupId == undefined || item.groupId == ''">{{item.userName}}</div>
+                <div class="desc-author" v-else>{{item.groupName}}</div>
                 <div class="desc-msg">
                     <span class="text">{{item.mark == 'from'?$store.state.user.userName:item.userName}}:{{item.value}}</span>
                 </div>
