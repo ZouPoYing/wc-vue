@@ -2,12 +2,16 @@
     <div>
         <header id="wx-header">
             <div class="other">
+                <!--群详情 -->
+                <span class="iconfont icon-chat-friends" @click="goto" v-show="$route.path==='/wechat/dialogue' && $route.query.isFriend===false"></span>
             </div>
             <div class="center">
                 <router-link to="/" tag="div" class="iconfont icon-return-arrow">
                     <span>微信</span>
                 </router-link>
                 <span>{{pageName}}</span>
+                <span class="parentheses"
+                      v-show='$route.query.group_num&&$route.query.group_num!=1'>{{$route.query.group_num}}</span>
             </div>
         </header>
         <section class="dialogue-section clearfix">
@@ -15,6 +19,7 @@
                 <div v-if="item.mark == 'to'">
                     <img :src="item.userHead" class="header">
                     <div v-if="item.type == 'friend'">
+                        <div class="left-name">{{item.userName}}</div>
                         <router-link :to="{path:'/contact/details',query:{wxid:item.value}}" tag="div">
                             <p class="text" v-more>
                                 <img style="width: 50px" :src="item.fHead">{{item.fName}}
@@ -22,16 +27,19 @@
                         </router-link>
                     </div>
                     <div v-else-if="item.type == 'pic'">
+                        <div class="left-name">{{item.userName}}</div>
                         <p class="text" v-more>
                             <img style="width: 200px" fit="widthFix" :src="item.fileUrl">
                         </p>
                     </div>
                     <div v-else-if="item.type == 'file'">
+                        <div class="left-name">{{item.userName}}</div>
                         <p class="text" v-more @click.stop="downloadFile(item.fileName)">
                             <i style="font-size: 50px" class="el-icon-folder-remove"></i>
                         </p>
                     </div>
                     <div v-else>
+                        <div class="left-name">{{item.userName}}</div>
                         <p class="text" v-more>{{item.value}}</p>
                     </div>
                 </div>
@@ -141,6 +149,14 @@
         clearInterval(this.timer);
       },
       methods: {
+        goto() {
+          this.$router.push({
+            path: 'dialogue/dialogue-detail',
+            query: {
+              group_id: this.$route.query.friend
+            }
+          })
+        },
         downloadFile(fileName) {
           window.location.href='http://localhost:8070/file/downloadFile/' + fileName;
         },
@@ -363,5 +379,8 @@
         content: "";
         border: 6px solid transparent;
         border-left-color: #9eea6a;
+    }
+    .left-name {
+        color: gray;
     }
 </style>

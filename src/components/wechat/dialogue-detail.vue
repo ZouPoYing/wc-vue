@@ -11,9 +11,9 @@
         </header>
         <div class="member">
             <ul class="chat-dialogue-entry-collect">
-                <li v-for="item in $route.query.msgInfo.user">
-                    <div><img :src="item.headerUrl"></div>
-                    <p>{{item.remark||item.nickname}}</p> 
+                <li v-for="(item,index) in group.friendDetails" :key="index">
+                    <div><img :src="item.friendHead"></div>
+                    <p>{{item.friendName}}</p>
                 </li>
                 <li>
                     <div><span class="iconfont icon-chat-detail-add"></span></div>
@@ -21,49 +21,74 @@
             </ul>
         </div>
         <div class="weui-cells">
-            <div class="weui-cell weui-cell_switch">
-                <div class="weui-cell__bd">置顶聊天</div>
-                <div class="weui-cell__ft"><input type="checkbox" class="weui-switch"></div>
-            </div>
-            <div class="weui-cell weui-cell_switch">
-                <div class="weui-cell__bd">消息免打扰</div>
-                <div class="weui-cell__ft"><input type="checkbox" class="weui-switch"v-model="$route.query.msgInfo.quiet"></div>
+            <div class="weui-cell weui-cell_access" @click="pop">
+                <div class="weui-cell__bd">群名称</div>
+                <div class="weui-cell__ft">{{group.groupName}}</div>
             </div>
         </div>
-        <div class="weui-cells">
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd">聊天文件</div>
-                <div class="weui-cell__ft"></div>
+        <el-dialog class="dialog" width="80%" title="修改群名称" :visible.sync="dialogFormVisible" append-to-body>
+            <el-form :model="form">
+                <el-form-item>
+                    <el-input v-model="form.msg" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="success" @click="change">确 定</el-button>
             </div>
-        </div>
-        <div class="weui-cells">
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd">设置当前聊天背景</div>
-                <div class="weui-cell__ft"></div>
-            </div>
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd">查找聊天内容</div>
-                <div class="weui-cell__ft"></div>
-            </div>
-        </div>
-        <div class="weui-cells">
-            <div class="weui-cell">
-                <div class="weui-cell__bd">清空聊天记录</div>
-                <div class="weui-cell__ft"></div>
-            </div>
-        </div>
-        <div class="weui-cells">
-            <div class="weui-cell weui-cell_access">
-                <div class="weui-cell__bd">投诉</div>
-                <div class="weui-cell__ft"></div>
-            </div>
-        </div>
+        </el-dialog>
     </div>
 </template>
 <script>
+  import axios from "axios";
+
     export default {
-        mounted(){
-            console.log(this.$route.query.msgInfo)
+      data() {
+        return {
+          group: [],
+          dialogFormVisible: false,
+          form: {
+            msg: ''
+          }
+        }
+      },
+      created () {
+        this.initPage()
+      },
+      methods: {
+        change() {
+          var that = this
+          axios.post('/group/updateGroupName', {
+            groupId: that.$route.query.group_id,
+            groupName: that.form.msg,
+            userId: that.$store.state.user.userId
+          }).then(function(res) {
+            if (res.data.success) {
+              that.getGroupDetail()
+            } else {
+              that.$toast(res.data.msg);
+            }
+          })
+          that.pop()
+        },
+        getGroupDetail() {
+          var that = this
+          axios.post('/group/getGroupDetail', {
+            groupId: that.$route.query.group_id
+          }).then(function(res) {
+            if (res.data.success) {
+              that.group = res.data.group
+            }
+          })
+        },
+        pop() {
+          this.dialogFormVisible = !this.dialogFormVisible
+        },
+        initPage() {
+          this.getGroupDetail()
+        }
+      },
+      mounted(){
         }
     }
 
@@ -81,7 +106,7 @@
         color: #464646;
         font-size: 14px;
     }
-    
+
     .chat-dialogue-entry-collect:before {
         content: "";
         position: absolute;
@@ -96,7 +121,7 @@
         height: 1px;
         z-index: 2;
     }
-    
+
     .chat-dialogue-entry-collect li {
         float: left;
         flex-grow: 1;
@@ -105,7 +130,7 @@
         padding: 5px 10px;
         text-align: center;
     }
-    
+
     .chat-dialogue-entry-collect li>div {
         position: relative;
         border-radius: 6px;
@@ -116,15 +141,15 @@
         background-size: cover;
         border: 1px solid #eee;
     }
-    
+
     .chat-dialogue-entry-collect li>div img {
         width: 100%;
     }
-    
+
     .chat-dialogue-entry-collect li p {
         margin-top: 5px;
     }
-    
+
     .chat-dialogue-entry-collect li .iconfont {
         font-size: 23px;
         color: #bbb;

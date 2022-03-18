@@ -100,7 +100,8 @@
             path: '/wechat/dialogue',
             query: {
               name: this.info.userName,
-              friend: this.info.userId
+              friend: this.info.userId,
+              isFriend: true
             }
           })
         },
